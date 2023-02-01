@@ -1,0 +1,25 @@
+import logging
+from telegram import Voice, ParseMode
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Hi! I'm a Telegram bot for anonymous voice messaging. Send me a voice message and I'll forward it to another subscriber.")
+
+def voice_message(update, context):
+    voice = update.message.voice
+    context.bot.send_voice(chat_id='<anonymous_chat_id>', voice=voice, reply_to_message_id=update.message.message_id)
+
+def main():
+    updater = Updater(token='<your_telegram_bot_token>', use_context=True)
+
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(MessageHandler(Filters.voice, voice_message))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
